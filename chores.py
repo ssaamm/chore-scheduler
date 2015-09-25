@@ -12,6 +12,10 @@
 
 import collections
 import sys
+from datetime import date, timedelta
+
+DAYS_IN_WK = 7
+SATURDAY = 5
 
 Chore = collections.namedtuple('Chore', ['period_wks', 'assignee', 'description'])
 Week = collections.namedtuple('Week', ['num', 'chores'])
@@ -49,9 +53,14 @@ if __name__ == '__main__':
     weeks = [Week(num=i, chores=get_chores(all_chores, assignees, i))
             for i in range(num_weeks)]
 
+    # http://stackoverflow.com/questions/16769902/
+    this_week = date.today() + timedelta((DAYS_IN_WK + SATURDAY -
+        date.today().weekday()) % DAYS_IN_WK)
+
     max_assignee_len = max(len(s) for s in assignees)
     for week in weeks:
-        print '## Week', week.num
+        print '## Week {wn} (ending {date})'.format(wn=week.num,
+                date=this_week + timedelta(weeks=week.num))
         for chore in week.chores:
             print '[ ] {a:{awdth}} - {c}'.format(a=chore.assignee,
                     awdth=max_assignee_len + 1,
