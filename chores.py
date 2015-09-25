@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 # Chore assigner
+# 
+# Usage: python chores.py <chore file> [<num weeks>]
 #
-# format of chore file:
-# Lines can be in this format:
+# Lines of a chore file can be in this format:
 #
 # <period (in weeks)> <init assignee> <description>
 # or
@@ -15,18 +16,17 @@ import sys
 Chore = collections.namedtuple('Chore', ['period_wks', 'assignee', 'description'])
 Week = collections.namedtuple('Week', ['num', 'chores'])
 
-def assign(chore, all_chores, assignees, week_num):
+def assign(chore, assignees, week_num):
     init_assignee_ndx = assignees.index(chore.assignee)
     new_assignee = assignees[(init_assignee_ndx + week_num) % len(assignees)]
     return Chore(chore.period_wks, new_assignee, chore.description)
 
 def get_chores(all_chores, assignees, week_num):
-    chores = [assign(c, all_chores, assignees, week_num)
-            for c in all_chores if week_num % c.period_wks == 0]
-    return chores
+    return (assign(c, assignees, week_num)
+            for c in all_chores if week_num % c.period_wks == 0)
 
 if __name__ == '__main__':
-    chores = []
+    all_chores = []
     assignees = set()
 
     if len(sys.argv) < 1:
@@ -39,24 +39,21 @@ if __name__ == '__main__':
             if len(s) < 2:
                 assignees.add(s[0])
             else:
-                chores.append(Chore(period_wks=int(s[0]),
+                all_chores.append(Chore(period_wks=int(s[0]),
                     assignee=s[1],
                     description=' '.join(s[2:])))
                 assignees.add(s[1])
 
     assignees = list(assignees)
     num_weeks = int(sys.argv[2]) if len(sys.argv) > 2 else 6
-    weeks = []
-
-    for week_num in range(num_weeks):
-        weeks.append(Week(num=week_num,
-            chores=get_chores(chores, assignees, week_num)))
+    weeks = [Week(num=i, chores=get_chores(all_chores, assignees, i))
+            for i in range(num_weeks)]
 
     max_assignee_len = max(len(s) for s in assignees)
     for week in weeks:
         print '## Week', week.num
         for chore in week.chores:
-            print '[ ] {a:<{awdth}} - {c}'.format(a=chore.assignee,
+            print '[ ] {a:{awdth}} - {c}'.format(a=chore.assignee,
                     awdth=max_assignee_len + 1,
                     c=chore.description)
         print
