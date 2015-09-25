@@ -29,7 +29,7 @@ if __name__ == '__main__':
     all_chores = []
     assignees = set()
 
-    if len(sys.argv) < 1:
+    if len(sys.argv) < 2:
         print 'Usage: {} <chore file> [<num weeks>]'.format(sys.argv[0])
         sys.exit(1)
 
