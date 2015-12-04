@@ -69,6 +69,6 @@ if __name__ == '__main__':
                 date=pretty_date)
         for chore in week.chores:
             print '[ ] {a:{awdth}} - {c}'.format(a=chore.assignee,
-                    awdth=max_assignee_len + 1,
+                    awdth=max_assignee_len,
                     c=chore.description)
         print
