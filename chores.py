@@ -2,8 +2,6 @@
 
 # Chore assigner
 # 
-# Usage: python chores.py <chore file> [<num weeks>]
-#
 # Lines of a chore file can be in this format:
 #
 # <period (in weeks)> <init assignee> <description>
