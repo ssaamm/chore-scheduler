@@ -12,10 +12,12 @@
 
 import collections
 import sys
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 DAYS_IN_WK = 7
 SATURDAY = 5
+
+DATE_FMT = '%Y-%m-%d'
 
 Chore = collections.namedtuple('Chore', ['period_wks', 'assignee', 'description'])
 Week = collections.namedtuple('Week', ['num', 'chores'])
@@ -34,7 +36,7 @@ if __name__ == '__main__':
     assignees = set()
 
     if len(sys.argv) < 2:
-        print 'Usage: {} <chore file> [<num weeks>]'.format(sys.argv[0])
+        print 'Usage: {} <chore file> [<num weeks>] [<start date>]'.format(sys.argv[0])
         sys.exit(1)
 
     with open(sys.argv[1], 'r') as f:
@@ -54,13 +56,17 @@ if __name__ == '__main__':
             for i in range(num_weeks)]
 
     # http://stackoverflow.com/questions/16769902/
-    this_week = date.today() + timedelta((DAYS_IN_WK + SATURDAY -
-        date.today().weekday()) % DAYS_IN_WK)
+    start = date.today()
+    if len(sys.argv) > 3:
+        start = datetime.strptime(sys.argv[3], DATE_FMT)
+    this_week = start + timedelta((DAYS_IN_WK + SATURDAY -
+        start.weekday()) % DAYS_IN_WK)
 
     max_assignee_len = max(len(s) for s in assignees)
     for week in weeks:
+        pretty_date = (this_week + timedelta(weeks=week.num)).strftime(DATE_FMT)
         print '## Week {wn} (ending {date})'.format(wn=week.num,
-                date=this_week + timedelta(weeks=week.num))
+                date=pretty_date)
         for chore in week.chores:
             print '[ ] {a:{awdth}} - {c}'.format(a=chore.assignee,
                     awdth=max_assignee_len + 1,
